@@ -1,0 +1,8 @@
+# Unephra Processor — Python dependencies
+# Install with: pip install -r requirements.txt
+
+numpy>=1.24.0
+
+
+# Install separately following their instructions.
+# kbm_ledsas_sdk

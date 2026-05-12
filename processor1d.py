@@ -92,7 +92,7 @@ logger = logging.getLogger("unephra.processor.production")
 
 # LEDSAS / Kubyk service registration
 
-app = ServiceApp(service_name="unephra-processor-direct")
+app = ServiceApp(service_name="CustomLocalService")
 
 
 # Column index constants — V7 raw input CSV (15 columns)
@@ -1065,7 +1065,7 @@ def build_kubyk_values(
 
 # Main request handler
 
-@app.handler("ProcessCSV")
+@app.handler("process")
 async def process_csv(ctx, req: Dict[str, Any]) -> Dict[str, Any]:
     logger.info(
         "Received ProcessCSV request version=%s",

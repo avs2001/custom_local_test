@@ -1,25 +1,16 @@
-FROM python:3.11-slim
+FROM kbmcontainerregistry.azurecr.io/base/kbm-ledsas-base-production:0.2.2
 
-WORKDIR /app
+# Base image already provides: python:3.11-alpine3.20, kbm_ledsas_sdk 0.2.2
+# (production-mode build), WORKDIR /app, and a non-root kbmuser. Switch to
+# root only for the pip install of customer deps, then back to kbmuser.
 
-# SDK version is parameterized so this Dockerfile follows the SDK without edits.
-# The customer bundles the matching tarball into the repo before `docker build`.
-ARG SDK_VERSION=0.2.2
+USER root
 
-# Install pinned service deps (honors the customer's requirements.txt pins)
-# plus the SDK wheel from the local tar.gz (Kubyk contract: wheel ships with the repo)
 COPY requirements.txt .
-COPY ledsas-sdk-production-v${SDK_VERSION}.tar.gz .
-RUN tar -xzf ledsas-sdk-production-v${SDK_VERSION}.tar.gz && \
-    pip install --no-cache-dir \
-    -r requirements.txt \
-    ledsas-sdk-production-v${SDK_VERSION}/1-sdk/kbm_ledsas_sdk-${SDK_VERSION}-py3-none-any.whl && \
-    rm -rf ledsas-sdk-production-v${SDK_VERSION}.tar.gz ledsas-sdk-production-v${SDK_VERSION}
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY main.py .
+COPY --chown=kbmuser:kbmuser main.py .
 
-# Run as non-root user
-RUN useradd -m appuser && chown -R appuser:appuser /app
-USER appuser
+USER kbmuser
 
 CMD ["python", "main.py"]
